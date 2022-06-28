@@ -1,3 +1,4 @@
+from documentGenerator.DocumentMarkdown import DocumentMarkdown
 from vulnerability import nmapVul
 
 
@@ -7,4 +8,6 @@ def sayHello():
 if __name__ == '__main__':
     sayHello()
     adresse = input("Saisisez l'adresse de la machine à scanner => ")
-    print('result = ' +nmapVul(adresse))
+    document = DocumentMarkdown("testScanResult")
+    scanResult = nmapVul(adresse)
+    document.addCode("Scan de Vulnérabilité", scanResult)
