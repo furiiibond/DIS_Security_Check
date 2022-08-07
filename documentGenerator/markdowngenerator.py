@@ -72,6 +72,7 @@ class MarkdownGenerator:
         :param footnote_index
         """
 
+        self.file = None
         self.logger = logger if logger else logging.getLogger()
         self.logger.name = __name__
         self.logger.debug("Filename in constructor is {}".format(filename))
@@ -172,6 +173,13 @@ class MarkdownGenerator:
         if not self.enable_write:
             self.document.writelines(self.document_data_array)
         self.document.close()
+        self.killDocument()
+
+    def killDocument(self):
+        """
+        Close file and delete temporary directory.
+        """
+        self.document = None
 
     def genFootNotes(self, genHeader=False):
         """
@@ -228,9 +236,9 @@ class MarkdownGenerator:
             + self.document_data_array[linenumber - 1 :]
         )
         if self.enable_write:
-            self.document.close()
-            self.document = open(self.file, "w")
-            self.document.writelines(self.document_data_array)
+            pass#self.document.close()
+            #self.document = open(f"{self.filename}", "w+")
+            #self.document.writelines(self.document_data_array)
 
     def writeText(self, text, html_escape: bool = True):
         """
