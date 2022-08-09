@@ -1,5 +1,6 @@
 # coding=utf-8
-from ProcessCommande import ProcessCommande, passSudo
+from ProcessCommande import ProcessCommande
+from criticalEquipment.CriticalEquipment import CriticalEquipment
 from documentGenerator.DocumentMarkdown import DocumentMarkdown
 from networkMapper.NetworkMapper import NetworkMapper
 from vulnerability import *
