@@ -35,6 +35,10 @@ class DocumentMarkdown:
         self.doc.addHeader(2, title)
         self.doc.addCodeBlock(code)
 
+    def addCodeBlock(self, code):
+        self.doc.__enter__()
+        self.doc.addCodeBlock(code)
+
     def writeSumary(self, text):
         self.doc.__enter__()
         self.doc.addHeader(3, "Résultat du scan")
@@ -49,7 +53,7 @@ class DocumentMarkdown:
     def addImage(self, altText):
         self.doc.__enter__()
         uri = self.dialogUri()
-        self.doc.generateImageHrefNotation(uri, altText)
+        self.doc.writeTextLine(self.doc.generateImageHrefNotation(uri, altText))
 
 
     def dialogUri(self):

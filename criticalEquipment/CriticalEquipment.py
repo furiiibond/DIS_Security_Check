@@ -1,8 +1,8 @@
-from utils import getAllHostsOnNetwork, getOSOfHost
+from utils import getAllHostsOnNetwork, getOSOfHost, isNetwork
 
 
 class CriticalEquipment:
-    def __init__(self, commadeProcessor, document):
+    def __init__(self, commadeProcessor, document, testMode = False):
         self.commadeProcessor = commadeProcessor
         self.document = document
         self.init()
@@ -10,13 +10,15 @@ class CriticalEquipment:
         self.oldWindowsList = []
         self.wifi = []
         self.brutex = []
-        while self.menu():
-            pass
+        if not testMode:
+            while self.menu():
+                pass
 
     def init(self): # explanations of the program
-        print("-----------------Identification des équipements critiques-----------------")
+        pass
 
     def menu(self):
+        print("-----------------[4] Identification des équipements critiques-----------------")
         print("1. Detection des anciennes versions de Windows")
         print("2. Analyse de la sécurité du wifi avec Wifite")
         print("3. Attaque par brutforce et detection des mot de passes simple (ftp, smb ...) avec Brutex")
@@ -46,7 +48,7 @@ class CriticalEquipment:
         yn = input("voulez vous continuer ? (y/n)")
         if yn == "y" or yn == "Y":
             ip = input("Saisisez l'adresse de la machine ou du réseau à scanner exemple : [192.168.0.*] => ")
-            if "*" or "-" in ip: # networkMode
+            if isNetwork(ip): # networkMode
                 hosts = getAllHostsOnNetwork(ip)
                 for i, host in enumerate(hosts):
                     print("Progression : {}/{}".format(i, len(hosts)))
@@ -107,7 +109,7 @@ class CriticalEquipment:
         yn = input("voulez vous continuer ? (y/n)")
         if yn == "y" or yn == "Y":
             ip = input("Saisisez l'adresse de la machine ou du réseau à scanner exemple : [192.168.0.*] => ")
-            if "-" or "*" in ip: # network scan
+            if isNetwork(ip): # network scan
                 hosts = getAllHostsOnNetwork(ip)
                 for i, host in enumerate(hosts):
                     print("----------------------------------------------------")

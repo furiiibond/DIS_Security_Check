@@ -8,7 +8,7 @@ import paramiko
 
 class ProcessCommande:
 
-    def __init__(self, ssh_server = '', ssh_user = '', ssh_password = ''):
+    def __init__(self, sudoPassword = 'kali', ssh_server = '', ssh_user = '', ssh_password = ''):
         """
         :param ssh_server: ip of the ssh server
         :param ssh_user: user of the ssh server
@@ -20,9 +20,10 @@ class ProcessCommande:
         self.ssh_server = ssh_server
         self.ssh_user = ssh_user
         self.ssh_password = ssh_password
+        self.sudoPassword = sudoPassword
         self.connect()
 
-    def execute(self, commande, noBlock = False):
+    def execute(self, commande, noBlock = False, root = False):
         """
         :param commande: commande to execute
         :return: result of the command
@@ -33,10 +34,12 @@ class ProcessCommande:
             self.stdin, self.stdout, self.stderr = self.ssh.exec_command(commande)
             result = self.stdout.read().decode('utf-8')
         else:
+            if root:
+                commande = 'echo %s|sudo -S %s' % (self.sudoPassword, commande)
             if noBlock: # execution non bloquante
                 print('Execution non bloquante')
                 p = subprocess.Popen(commande, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                time.sleep(1)
+                time.sleep(2)
                 p.terminate()
                 result = ''
             else: # execution bloquante
@@ -70,7 +73,7 @@ class ProcessCommande:
             self.stdin.flush()
             print(self.stdout.read().decode('utf-8'))
         else:
-            self.setDisplay()
+            #self.setDisplay()
             print('Pas de connexion SSH')
 
 
@@ -95,7 +98,8 @@ def passSudo(commadeProcessor):
     :param commadeProcessor: instance of the class ProcessCommande
     :return:
     """
+    print("-------------------------------------------------")
     print('Passage en sudo')
-    password = commadeProcessor.ssh_password
-    commande = 'sudo -S \n ' + 'echo "' + password + '\n'
+    password = input('Entrez le mot de passe de l\'utilisateur root : ')
+    commande = 'sudo -S \n ' + 'echo "' + password + '"\n'
     commadeProcessor.execute(commande)

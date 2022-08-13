@@ -16,7 +16,7 @@ class Wireshark:
 
     def start(self):
         print("--------------Démarrage de wireshark--------------")
-        self.commadeProcessor.execute("sudo wireshark") # start wireshark
+        self.commadeProcessor.execute("sudo -E wireshark", True, True) # start wireshark
         print("-------------------------------------------------")
         print("si wireshark n'est pas lancé, il faut lancer en tapant la commande suivante : [sudo wireshark] dans un terminal")
 
@@ -55,7 +55,7 @@ class Wireshark:
         # broadcast storm
         if self.isBroadcastStorm:
             document.writeTextLine("L'équipement suivent semble émetre de façon anormal des paquets broadcast. \n")
-            document.addCode("nom de équipement problématique", self.equipementName)
+            document.addCodeBlock(self.equipementName)
         # other equipment problem
         if len(self.equipmentList) > 0:
             document.writeTextLine("Il y a un problème avec un ou plusieurs autres équipement")

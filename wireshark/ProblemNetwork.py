@@ -13,6 +13,6 @@ class ProblemNetwork:
 
     def toDocument(self, document):
         document.writeTextLine("L'équipement suivant est problématique. \n")
-        document.addCode("nom de équipement problématique", self.scanName)
+        document.addCodeBlock(self.scanName)
         if self.commentaire:
             document.writeTextLine("Commentaire supplementaire : " + self.commentaire)
