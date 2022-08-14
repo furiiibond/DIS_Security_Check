@@ -38,3 +38,7 @@ def isNetwork(network):
     :return:
     """
     return "*" in network or "-" in network
+
+def getNetbiosName(commadeProcessor, ipv4):
+    commande = 'sudo nmap -sU --script nbstat.nse -p137 ' + ipv4
+    return commadeProcessor.execute(commande)

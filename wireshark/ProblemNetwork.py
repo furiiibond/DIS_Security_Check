@@ -1,4 +1,4 @@
-from vulnerability import getNetbiosName
+from utils import getNetbiosName
 
 
 class ProblemNetwork:

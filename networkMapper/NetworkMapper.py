@@ -8,7 +8,7 @@ class NetworkMapper:
         self.addImage()
 
     def init(self):
-        print("--------------Explications--------------")
+        print("\n--------------Explications--------------\n")
         print("Zenmap est un outil de scan de réseau qui permet d'obtenir une vue d'ensemble du réseau.\n")
         print("Une fois lancé, ajoutez dans le champs Target l'ip du réseau que vous voulez scanner")
         print("Exemple : 192.168.0.* pour scanner tout le réseau 192.168.0")

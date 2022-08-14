@@ -1,4 +1,4 @@
-from vulnerability import getNetbiosName
+from utils import getNetbiosName
 from wireshark.ProblemNetwork import ProblemNetwork
 
 
@@ -16,7 +16,7 @@ class Wireshark:
 
     def start(self):
         print("--------------Démarrage de wireshark--------------")
-        self.commadeProcessor.execute("sudo -E wireshark", True, True) # start wireshark
+        self.commadeProcessor.execute("wireshark", True, False) # start wireshark
         print("-------------------------------------------------")
         print("si wireshark n'est pas lancé, il faut lancer en tapant la commande suivante : [sudo wireshark] dans un terminal")
 

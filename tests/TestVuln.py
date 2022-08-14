@@ -4,7 +4,7 @@ import unittest
 from ProcessCommande import ProcessCommande
 from documentGenerator.DocumentMarkdown import DocumentMarkdown
 from utils import getAllHostsOnNetwork
-from vulnerability import cmd_scan_vuln
+from vulnerability.Vulnerability import cmd_scan_vuln
 
 
 

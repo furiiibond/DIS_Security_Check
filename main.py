@@ -4,25 +4,27 @@ from criticalEquipment.CriticalEquipment import CriticalEquipment
 from documentGenerator.DocumentMarkdown import DocumentMarkdown
 from networkMapper.NetworkMapper import NetworkMapper
 from smbSecurity.SmbSecurity import SmbSecurity
-from vulnerability import *
+from vulnerability.Vulnerability import *
 from wireshark.Wireshark import Wireshark
+import pyfiglet
 
 
 def sayHello():
     print("\033[1;32m Bienvenue dans l'application d'analyse de sécurité DIS \n")
 
-
+def banner():
+    print(pyfiglet.figlet_format("D I S - Security"))
 
 def menu(commadeProcessor, document):
     print("\n")
-    print("-------------------------------------------------")
-    print("\033[1;32m Menu principal \n")
-    print("1. Analyse de trame avec Wireshark")
-    print("2. Analyse de faille de sécurité")
-    print("3. Cartographie du réseau avec Zenmap")
-    print("4. Identification des équipements critiques")
-    print("5. Sécurisation des partages SMB")
-    print("6. Quitter et sauvgarder le document")
+    banner()
+    print("\033[1;32m-------------------------Menu principal------------------------\n")
+    print("1. Analyse de trame avec Wireshark\n")
+    print("2. Analyse de faille de sécurité\n")
+    print("3. Cartographie du réseau avec Zenmap\n")
+    print("4. Identification des équipements critiques\n")
+    print("5. Sécurisation des partages SMB\n")
+    print("6. Quitter et sauvgarder le document\n")
     choix = input("Votre choix : ")
     if choix == "1":
         Wireshark(commadeProcessor, document)
