@@ -26,11 +26,11 @@ class SmbSecurity:
     # Explain to the user the purpose SMB scan and enumeration
     def menu(self):
         print("\n")
-        print("\033[1;32m-----------------[5] Menu de sécurité SMB-----------------")
+        print("\033[1;32m-----------------[5] Menu de sécurité SMB-----------------\n")
         print(
-            "1 - Lister toutes les machines du réseau avec le protocole samba(smb) actif et les dossiers partager disponible sans connexion")
-        print("2 - Lister les répertoires partagés sur un hôte donné via une connection ou non")
-        print("3 - Quitter et sauvgarder le document")
+            "1 - Lister toutes les machines du réseau avec le protocole samba(smb) actif et les dossiers partager disponible sans connexion\n")
+        print("2 - Lister les répertoires partagés sur un hôte donné via une connection ou non\n")
+        print("3 - Quitter et sauvgarder le document\n")
         choice = input("Saisissez votre choix : ")
         if choice == "1":
             self.smb_multi_scan()
@@ -48,7 +48,7 @@ class SmbSecurity:
         print("\n-----------------SMB multi scan-----------------")
         print("Determination les machines qui sont accessible via SMB")
         # ask user for network adress
-        network = input("Saisissez l'adresse du réseau à scanner : ")
+        network = input("Saisissez l'adresse du réseau à scanner [192.168.0.*]: ")
         print("Scan en cours sur le réseau {}".format(network))
         if not isNetwork(network):
             print("Adresse d'une machine seule")

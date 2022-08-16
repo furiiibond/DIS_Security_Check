@@ -1,3 +1,5 @@
+import webbrowser
+
 
 class NetworkMapper:
     def __init__(self, commadeProcessor, document):
@@ -19,12 +21,12 @@ class NetworkMapper:
         print("Voulez-vous afficher la légende du graphe ainsi que des explications suplémentaires ?")
         yn = input("Y/N ? ")
         if yn == "y" or yn == "Y":
-            self.commadeProcessor.execute("firefox https://glitter-grill-597.notion.site/Documentation-Zenmap-095560d691c0467e9aacc83c5d3301c2&", False)
+            webbrowser.open("https://www.notion.so/352f0532469047ab9ed955df199d8e81")
         input("Appuyez sur entrée pour lancer Zenmap...")
 
 
     def start(self):
-        print("--------------Démarrage de Zenmap--------------")
+        print("\n--------------Démarrage de Zenmap--------------\n")
         self.commadeProcessor.execute("zenmap-kbx -n nmap -F --traceroute", True) # start zenmap
         print ("-------------------------------------------------")
         print ("si zenmap n'est pas lancé, il faut lancer en tapant la commande suivante : [sudo -E zenmap-kbx -n nmap -O --traceroute] dans un terminal")

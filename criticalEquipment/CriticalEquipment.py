@@ -18,11 +18,11 @@ class CriticalEquipment:
         pass
 
     def menu(self):
-        print("-----------------[4] Identification des équipements critiques-----------------")
-        print("1. Detection des anciennes versions de Windows")
-        print("2. Analyse de la sécurité du wifi avec Wifite")
-        print("3. Attaque par brutforce et detection des mot de passes simple (ftp, smb ...) avec Brutex")
-        print("4. Quitter et sauvgarder le document")
+        print("\n-----------------[4] Identification des équipements critiques-----------------\n")
+        print("1. Detection des anciennes versions de Windows\n")
+        print("2. Analyse de la sécurité du wifi avec Wifite\n")
+        print("3. Attaque par brutforce et detection des mot de passes simple (ftp, ssh, smb ...) avec Brutex\n")
+        print("4. Quitter et sauvgarder le document\n")
         choix = input("Votre choix : ")
         if choix == "1":
             self.detectionAnciennesVersionsWindows()
@@ -40,7 +40,7 @@ class CriticalEquipment:
 
     def detectionAnciennesVersionsWindows(self):
         self.readFromFileOldOS()
-        print("-------------------------------------------------")
+        print("\n-------------------------------------------------")
         print("\033[1;32m Detection des anciennes versions de Windows \n")
         print("La detection des anciennes versions de windows permet d'identifier les machines sous des versions de windows obsolètes ou à sécurité faible.")
         print("Pour cela, nous utilisons la commande 'sudo nmap [adresse] -O --osscan-guess --fuzzy -Pn'")
@@ -51,10 +51,10 @@ class CriticalEquipment:
             if isNetwork(ip): # networkMode
                 hosts = getAllHostsOnNetwork(ip)
                 for i, host in enumerate(hosts):
-                    print("Progression : {}/{}".format(i, len(hosts)))
-                    self.oldWindows.append(self.detectOsProblem(host))
+                    print("\033[1;32m Progression : {}/{}".format(i, len(hosts)))
+                    self.detectOsProblem(host)
             else: # singleMachine
-                self.oldWindows.append(self.detectOsProblem(ip))
+                self.detectOsProblem(ip)
             print("\033[1;32m L'analyse des anciennes versions de Windows est terminée \n")
 
     def readFromFileOldOS(self):
@@ -68,34 +68,39 @@ class CriticalEquipment:
             exit()
 
     def detectOsProblem(self, host):
-        (os, acuracy) = getOSOfHost(host)
+        result = getOSOfHost(host)
+        if result is None:
+            print("\033[1;31m Impossible de determiné l'OS de {} \n".format(host))
+            return [host, "inconnu", "0"]
+        else:
+            (os, acuracy) = result
         if any(osName in os for osName in self.oldWindowsList): # if os is in oldWindowsList
-            print("\033[1;32m La machine suivante semble avoir une version de windows obsoletes : \n")
+            print("\n \033[1;32m La machine suivante semble avoir une version de windows obsoletes : ")
             self.oldWindows.append([host, os, acuracy])
             print("Ipv4 : " + host)
             print("OS : " + os)
             print("fiabilité : " + acuracy + " %\n")
             return [host, os, acuracy]
         else:
-            print("Os : " + os + " - fabilité " + acuracy + " %\n" + "La version de la machine n'est pas obsolète")
+            print("\033[1;32m Os : " + os + " - fabilité " + acuracy + " %\n" + "La version de la machine n'est pas obsolète")
 
     def analyseSecuriteWifi(self):
-        print("-------------------------------------------------")
+        print("\n-------------------------------------------------")
         print("\033[1;32m Analyse de la sécurité du wifi avec Wifite \n")
         print("L'analyse de la sécurité du wifi permet de déterminer si le réseau est vulnerable à une attaque simple par dictionnaire")
         print("Pour cela, nous utilisons la commande 'sudo wifite'")
-        print("Wifite est automatisé neanmoins, il est possible de passer les premières analyses qui donnent raraementr suite au déchiffrage de clé")
+        print("Wifite est automatisé neanmoins, il est possible de passer les premières analyses qui donnent raraementr suite au déchiffrage de clé\n")
         print("Veuillez installer une interface wifi compatible 'monitor mode' pour pouvoir utiliser Wifite")
         yn = input("voulez vous continuer ? (y/n)")
         if yn == "y" or yn == "Y":
-            results = self.commadeProcessor.execute("sudo wifite")
+            self.commadeProcessor.execute("xterm -hold -fa 'Monospace' -fs 20 -e sudo wifite --dict /usr/share/wordlists/rockyou.txt", True, False)
             print("\033[1;32m L'analyse de la sécurité du wifi est terminée \n")
             yn = input("Le mot de passe du wifi à t'il été déchiffré ? (y/n)")
             if yn == "y" or yn == "Y":
                 print("\033[1;32m Le mot de passe du wifi à été déchiffré \n")
                 ssid = input("Saisisez le nom du réseau wifi : ")
                 password = input("Saisisez le mot de passe du réseau wifi : ")
-                self.wifi.append([ssid, password, results])
+                self.wifi.append([ssid, password])
             else:
                 print("\033[1;32m Le mot de passe du wifi n'a pas été déchiffré \n")
                 ssid = input("Saisisez le nom du réseau wifi : ")
@@ -115,7 +120,7 @@ class CriticalEquipment:
                     print("----------------------------------------------------")
                     print("\033[1;32m Analyse de la machine : " + host + " \n")
                     print("état d'avancement : " + str(i) + "/" + str(len(hosts)) + " machine(s) analysée(s)")
-                    result = self.commadeProcessor.execute("sudo brutex " + host)
+                    result = self.commadeProcessor.execute("sudo brutex " + host, False, False, True) # execute with auto-close
                     if "valid password found" in result:
                         lines = result.split("\n")
                         for line in lines:
@@ -124,7 +129,7 @@ class CriticalEquipment:
                                 print("\033[1;32m Un mot de passe de la machine " + host + " a été trouvé \n")
                                 print(line)
             else: # single host scan
-                result = self.commadeProcessor.execute("sudo brutex" + ip)
+                result = self.commadeProcessor.execute("sudo brutex" + ip, False, False, True)
                 if "valid password found" in result:
                     lines = result.split("\n")
                     for line in lines:
@@ -144,11 +149,10 @@ class CriticalEquipment:
             self.document.writeTextLine("OS : " + os)
             self.document.writeTextLine("fiabilité : " + acuracy + " %\n")
         self.document.headerTwo("Sécurité du wifi")
-        for [network, password, details] in self.wifi:
+        for [network, password] in self.wifi:
             if password:
                 self.document.writeTextLine("Le réseau " + network + " a été déchiffré avec le mot de passe : " + password)
                 self.document.writeTextLine("Les détails de l'attaque : ")
-                self.document.addCode(details)
             else:
                 self.document.writeTextLine("Le réseau " + network + " n'a pas été déchiffré")
         self.document.headerTwo("Attaque par brutforce et detections des mots de passes simples des machines du réseau")

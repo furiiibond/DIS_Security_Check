@@ -1,10 +1,14 @@
 # coding=utf-8
+import _thread
 import os
+import signal
 import time
 import subprocess
-import threading
+from threading import Thread
 
 import paramiko
+
+AUTO_KILL_DELAY = 1  # delay in minutes to kill a process
 
 class ProcessCommande:
 
@@ -21,15 +25,20 @@ class ProcessCommande:
         self.ssh_user = ssh_user
         self.ssh_password = ssh_password
         self.sudoPassword = sudoPassword
+        self.process = None
         self.connect()
 
-    def execute(self, commande, noBlock = False, root = False):
+    def execute(self, commande, noBlock = False, root = False, autoKill = False):
         """
         :param commande: commande to execute
+        :param noBlock: if True, the commande will be executed in background
+        :param root: if True, the commande will be executed as root
+        :param autoKill: if True, the process will end after a delay by sending a SIGINT signal
         :return: result of the command
         """
         print("-------------------------------------------------")
         print('Execution de la commande "' + commande +'"')
+        result = '' # initialize the result
         if self.isSSH:
             self.stdin, self.stdout, self.stderr = self.ssh.exec_command(commande)
             result = self.stdout.read().decode('utf-8')
@@ -41,9 +50,17 @@ class ProcessCommande:
                 p = subprocess.Popen(commande, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
                 time.sleep(2)
                 p.terminate()
-                result = ''
+            elif autoKill:
+                while self.process.poll() is None:
+                    time.sleep(AUTO_KILL_DELAY)
+                    result = self.process.communicate()[0].decode('utf-8')  # get the result of the command
+                    self.process.terminate()
+                    return result
             else: # execution bloquante
-                result = os.popen(commande).read()
+                self.process = subprocess.Popen(commande, stdout=subprocess.PIPE, shell=True)
+                self.process.wait(30) # wait for the end of the command
+                result = self.process.communicate()[0].decode('utf-8') # get the result of the command
+                self.process = None # no process in runing
         print(result)
         print("-------------------------------------------------")
         return result
@@ -75,6 +92,50 @@ class ProcessCommande:
         else:
             #self.setDisplay()
             print('Pas de connexion SSH')
+
+    def sigint(self):
+        """
+        kill the process if the user press Ctrl+C
+        return True if the process is killed
+        """
+        print("\n")
+        # Get the process id
+        if self.process is not None:
+            pid = self.process.pid
+            os.kill(pid, signal.SIGINT)
+            if not self.process.poll():
+                print("Process correctly halted pid : " + str(pid))
+            return True
+        else:
+            print("Pas de process à arrêter")
+        return False
+
+    def autoKill(self, pid, commande, process):
+        """
+        kill the process after a delay by sending a SIGINT signal
+        """
+        print("Auto kill in " + str(AUTO_KILL_DELAY) + " minutes")
+        delay = 60 * AUTO_KILL_DELAY
+        time.sleep(delay)
+        #check if the process is still running
+        while check_pid(pid):
+            _thread.interrupt_main()
+            process.send_signal(signal.SIGINT)
+            print("\nAUTO KILL pid: " + str(pid) + " commande : " + commande)
+            os.kill(pid, signal.CTRL_C_EVENT)
+            self.autoKill(pid, commande, process)
+
+
+
+def check_pid(pid):
+    """ Check For the existence of a unix pid. """
+    try:
+        os.kill(pid, 0)
+    except OSError:
+        return False
+    else:
+        return True
+
 
 
 def sudo_run_commands_remote(command, server_address, server_username, server_pass):

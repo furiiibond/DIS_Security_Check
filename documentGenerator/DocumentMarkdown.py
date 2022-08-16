@@ -1,3 +1,4 @@
+from documentGenerator.NotionUploader import NotionUploader
 from documentGenerator.markdowngenerator import MarkdownGenerator
 import matplotlib
 matplotlib.use('Agg')
@@ -64,4 +65,9 @@ class DocumentMarkdown:
         return uri
 
     def write(self):
+        self.__exit__()
+
+    def __exit__(self):
         self.doc.__exit__()
+        notionUploader = NotionUploader()
+        notionUploader.upload(os.path.realpath(self.filename + ".md"), self.filename)
