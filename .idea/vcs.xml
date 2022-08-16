@@ -2,5 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/wifite/pyrit-installer" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/wifite/pyrit-installer/Pyrit" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/wifite/wifite2" vcs="Git" />
   </component>
 </project>
