@@ -69,8 +69,12 @@ if __name__ == '__main__':
     signal.signal(signal.SIGINT, partial(sigintHandler, commandeProcessor, document)) # On gère le CTRL+C
     adresse = "192.168.0.70"#input("Saisisez l'adresse de la machine à scanner => ")
     #wifi_attaque(commadeProcessor)
-    while menu(commandeProcessor, document) == True:
-        pass
+    continueExc = True
+    while continueExc == True:
+        try:
+            continueExc = menu(commandeProcessor, document)
+        except Exception as e:
+            print(e)
 
 
 

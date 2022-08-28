@@ -128,18 +128,21 @@ class ActiveDirectory:
             print("\033[1;31mChoix invalide\033[1;m")
 
     def toDocument(self):
-        print("-----------------Sauvgarde du document-----------------")
-        self.document.headerOne("Active Directory")
-        self.document.writeTextLine("IP du serveur : {}".format(self.serverIP))
-        if self.shares is not None:
-            self.document.addCode("Partages samba", self.shares)
-        if self.users is not None:
-            self.document.addCode("Utilisateurs Active Directory", self.users)
-        if self.groups is not None:
-            self.document.addCode("Groupes Active Directory", self.groups)
-        if self.passPol is not None:
-            self.document.addCode("Politique de mots de passe Active Directory", self.passPol)
-        if self.sessions is not None:
-            self.document.addCode("Sessions actives", self.sessions)
+        if self.shares is not None or self.users is not None or self.groups is not None or self.passPol is not None or self.sessions is not None:
+            print("-----------------Sauvgarde du document-----------------")
+            self.document.headerOne("Active Directory")
+            self.document.writeTextLine("IP du serveur : {}".format(self.serverIP))
+            if self.shares is not None:
+                self.document.addCode("Partages samba", self.shares)
+            if self.users is not None:
+                self.document.addCode("Utilisateurs Active Directory", self.users)
+            if self.groups is not None:
+                self.document.addCode("Groupes Active Directory", self.groups)
+            if self.passPol is not None:
+                self.document.addCode("Politique de mots de passe Active Directory", self.passPol)
+            if self.sessions is not None:
+                self.document.addCode("Sessions actives", self.sessions)
+        else:
+            print("\033[1;31mAucune information a sauvgarder\033[1;m")
 
 

@@ -39,28 +39,32 @@ class ProcessCommande:
         print("-------------------------------------------------")
         print('Execution de la commande "' + commande +'"')
         result = '' # initialize the result
-        if self.isSSH:
-            self.stdin, self.stdout, self.stderr = self.ssh.exec_command(commande)
-            result = self.stdout.read().decode('utf-8')
-        else:
-            if root:
-                commande = 'echo %s|sudo -S %s' % (self.sudoPassword, commande)
-            if noBlock: # execution non bloquante
-                print('Execution non bloquante')
-                p = subprocess.Popen(commande, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
-                time.sleep(2)
-                p.terminate()
-            elif autoKill:
-                while self.process.poll() is None:
-                    time.sleep(AUTO_KILL_DELAY)
-                    result = self.process.communicate()[0].decode('utf-8')  # get the result of the command
-                    self.process.terminate()
-                    return result
-            else: # execution bloquante
-                self.process = subprocess.Popen(commande, stdout=subprocess.PIPE, shell=True)
-                self.process.wait(30) # wait for the end of the command
-                result = self.process.communicate()[0].decode('utf-8') # get the result of the command
-                self.process = None # no process in runing
+        try:
+            if self.isSSH:
+                self.stdin, self.stdout, self.stderr = self.ssh.exec_command(commande)
+                result = self.stdout.read().decode('utf-8')
+            else:
+                if root:
+                    commande = 'echo %s|sudo -S %s' % (self.sudoPassword, commande)
+                if noBlock: # execution non bloquante
+                    print('Execution non bloquante')
+                    p = subprocess.Popen(commande, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+                    time.sleep(2)
+                    p.terminate()
+                elif autoKill:
+                    self.process = subprocess.Popen(commande, stdout=subprocess.PIPE, shell=True)
+                    while self.process.poll() is None:
+                        time.sleep(AUTO_KILL_DELAY)
+                        result = self.process.communicate()[0].decode('utf-8')  # get the result of the command
+                        self.process.terminate()
+                        return result
+                else: # execution bloquante
+                    self.process = subprocess.Popen(commande, stdout=subprocess.PIPE, shell=True)
+                    self.process.wait() # wait for the end of the command
+                    result = self.process.communicate()[0].decode('utf-8') # get the result of the command
+                    self.process = None # no process in runing
+        except Exception as e:
+            print(e)
         print(result)
         print("-------------------------------------------------")
         return result

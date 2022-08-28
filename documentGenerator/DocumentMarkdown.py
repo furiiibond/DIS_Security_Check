@@ -21,7 +21,6 @@ class DocumentMarkdown:
     def headerOne(self, text):
         self.doc.__enter__()
         self.doc.addHeader(1, text)
-        self.doc.writeTextLine(f'{self.doc.addBoldedText("Scan DIS")}')
 
     def headerTwo(self, text):
         self.doc.__enter__()

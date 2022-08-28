@@ -1,5 +1,6 @@
 from utils import getAllHostsOnNetwork, getOSOfHost, isNetwork
 
+cmd_brutex = "brutex "
 
 class CriticalEquipment:
     def __init__(self, commadeProcessor, document, testMode = False):
@@ -120,44 +121,42 @@ class CriticalEquipment:
                     print("----------------------------------------------------")
                     print("\033[1;32m Analyse de la machine : " + host + " \n")
                     print("état d'avancement : " + str(i) + "/" + str(len(hosts)) + " machine(s) analysée(s)")
-                    result = self.commadeProcessor.execute("sudo brutex " + host, False, False, True) # execute with auto-close
-                    if "valid password found" in result:
-                        lines = result.split("\n")
-                        for line in lines:
-                            if "login:" and "password:" in line:
-                                self.brutex.append([ip, line])
-                                print("\033[1;32m Un mot de passe de la machine " + host + " a été trouvé \n")
-                                print(line)
+                    result = self.commadeProcessor.execute(cmd_brutex + host, False, False, False) # execute with auto-close
+                    self.bruteScanHost(host, ip, result)
             else: # single host scan
-                result = self.commadeProcessor.execute("sudo brutex" + ip, False, False, True)
-                if "valid password found" in result:
-                    lines = result.split("\n")
-                    for line in lines:
-                        if "login:" and "password:" in line:
-                            self.brutex.append([ip, line])
-                    print("\033[1;32m Un mot de passe d'une machine à été déchiffré \n")
+                result = self.commadeProcessor.execute(cmd_brutex + ip, False, False, False)
+                self.bruteScanHost(ip, ip, result)
             print("\033[1;32m L'attaque par brutforce est terminée \n")
 
-
+    def bruteScanHost(self, host, ip, result):
+        print("\033[1;32m Analyse des résultats : " + host + " \n")
+        if "login:" and "password:" in result:
+            lines = result.split("\n")
+            for line in lines:
+                if "login:" and "password:" in line:
+                    self.brutex.append([ip, line])
+                    print("\n\033[1;31m Un mot de passe de la machine " + host + " a été trouvé \n")
+                    print(line)
 
     def toDocument(self):
-        self.document.headerOne("équipements critiques")
-        self.document.headerTwo("Anciennes versions de Windows")
-        for [host, os, acuracy] in self.oldWindows:
-            self.document.writeTextLine("La machine suivante semble avoir des anciennes versions de windows : ")
-            self.document.writeTextLine("Ipv4 : " + host)
-            self.document.writeTextLine("OS : " + os)
-            self.document.writeTextLine("fiabilité : " + acuracy + " %\n")
-        self.document.headerTwo("Sécurité du wifi")
-        for [network, password] in self.wifi:
-            if password:
-                self.document.writeTextLine("Le réseau " + network + " a été déchiffré avec le mot de passe : " + password)
-                self.document.writeTextLine("Les détails de l'attaque : ")
-            else:
-                self.document.writeTextLine("Le réseau " + network + " n'a pas été déchiffré")
-        self.document.headerTwo("Attaque par brutforce et detections des mots de passes simples des machines du réseau")
-        for [ip, details] in self.brutex:
-            self.document.writeTextLine("Un des services de la machine " + ip + " a été déchiffré : ")
-            self.document.addCode(details)
-
-
+        if len(self.oldWindows) > 0 or len(self.wifi) > 0 or len(self.brutex) > 0:
+            self.document.headerOne("équipements critiques")
+            if len(self.oldWindows) > 0:
+                self.document.headerTwo("Anciennes versions de Windows")
+                for [host, os, acuracy] in self.oldWindows:
+                    self.document.writeTextLine("La machine suivante semble avoir des anciennes versions de windows : ")
+                    self.document.writeTextLine("Ipv4 : " + host)
+                    self.document.writeTextLine("OS : " + os)
+                    self.document.writeTextLine("fiabilité : " + acuracy + " %\n")
+            if len(self.wifi) > 0:
+                self.document.headerTwo("Sécurité du wifi")
+                for [network, password] in self.wifi:
+                    if password:
+                        self.document.writeTextLine("Le réseau " + network + " a été déchiffré avec le mot de passe : " + password)
+                    else:
+                        self.document.writeTextLine("Le réseau " + network + " n'a pas été déchiffré")
+            if len(self.brutex) > 0:
+                self.document.headerTwo("Attaque par brutforce et detections des mots de passes simples des machines du réseau")
+                for [ip, details] in self.brutex:
+                    self.document.writeTextLine("services de la machine " + ip + " a été déchiffré : ")
+                    self.document.addCodeBlock(details)
